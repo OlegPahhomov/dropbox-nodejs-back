@@ -1,5 +1,6 @@
 var pg = require('pg');
-var formidable = require('formidable')
+var util = require('util');
+var formidable = require('formidable');
 var connectionString = process.env.DATABASE_URL || 'postgres://postgres:12345@localhost:5432/postgres';
 
 
@@ -20,30 +21,36 @@ module.exports = {
         });
     },
     addFiles: function (req, res) {
-        var form = new formidable.IncomingForm();
-        form.multiples = true;
-        form.parse(req, function (err, fields, files) {
-            console.log(files);
-            if (err) {
-                console.error(err.message);
-                return;
-            }
-            for (var i = 0; i < files.length; i++) {
-                console.log(files[i]);
-                /*pg.connect(connectionString, function (err, client, done) {
-                    var query = client.query("INSERT INTO FILE ( name, ratio ) values ($1, $2)", [files[0].name], 1);
-                    //var query2 = client.query("INSERT INTO CONTENT(file_id, type, content) VALUES ($1, $2, $3)", []);
+        var form = new formidable.IncomingForm(),
+            files = [];
 
-                    query.on('end', function () {
-                        client.end();
-                        return res.json("");
-                    });
-                    if (err) {
-                        console.log(err);
-                    }
-                });*/
-            }
-        });
+        form
+            .on('file', function (field, file) {
+                files.push(file);
+            })
+            .on('end', function () {
+                for (var i = 0; i < files.length; i++) {
+                    console.log(i);
+                    var file = files[i];
+                    //insert to db
+                }
+                //res.writeHead(200, {'content-type': 'text/plain'});
+                //res.end('received files:\n\n ' + util.inspect(files));
+            });
+        form.parse(req);
         return res.json("");
+        /*pg.connect(connectionString, function (err, client, done) {
+         var query = client.query("INSERT INTO FILE ( name, ratio ) values ($1, $2)", [files[0].name], 1);
+         //var query2 = client.query("INSERT INTO CONTENT(file_id, type, content) VALUES ($1, $2, $3)", []);
+
+         query.on('end', function () {
+         client.end();
+         return res.json("");
+         });
+         if (err) {
+         console.log(err);
+         }
+         });*/
     }
+}
 }
