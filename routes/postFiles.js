@@ -1,4 +1,5 @@
 var pg = require('pg');
+var util = require('util');
 var formidable = require('formidable');
 var connectionString = process.env.DATABASE_URL || 'postgres://postgres:12345@localhost:5432/postgres';
 
@@ -18,8 +19,8 @@ module.exports = {
         });
     },
     addFiles: function (req, res) {
-        var form = new formidable.IncomingForm(),
-            files = [];
+        var form = new formidable.IncomingForm();
+        var files = [];
 
         form
             .on('file', function (field, file) {
@@ -29,11 +30,10 @@ module.exports = {
                 for (var i = 0; i < files.length; i++) {
                     console.log(i);
                     var file = files[i];
-                    //insert to db
                 }
-                //res.writeHead(200, {'content-type': 'text/plain'});
-                //res.end('received files:\n\n ' + util.inspect(files));
             });
+        form.parse(req);
+        return res.json("");
     }
 };
 
